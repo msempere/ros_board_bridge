@@ -10,6 +10,11 @@
 #define PIN_MODE       'c'
 #define DIGITAL_READ   'd'
 #define READ_ENCODERS  'e'
+
+/* KL25Z commands */
+#define READ_KL25Z_ACCELEROMETER 'f'
+
+ 
 #define MOTOR_SPEEDS   'm'
 #define PING           'p'
 #define RESET_ENCODERS 'r'
