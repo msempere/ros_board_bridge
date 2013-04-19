@@ -1,0 +1,2 @@
+The .s19 file, contains the specific bytes that need to be written to the program memory of the chip on the FRDM-KL25Z board.
+Copy the .s19 file into the FRDM-KL25Z drive.
