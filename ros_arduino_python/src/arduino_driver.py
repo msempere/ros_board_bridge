@@ -28,6 +28,7 @@ import time
 import sys, traceback
 from serial.serialutil import SerialException
 from serial import Serial
+import struct
 
 SERVO_MAX = 180
 SERVO_MIN = 0
@@ -97,6 +98,7 @@ class Arduino:
             below in a thread safe manner.
         '''
         self.port.write(cmd + '\r')
+        
 
     def recv(self, timeout=0.5):
         timeout = min(timeout, self.timeout)
@@ -116,8 +118,9 @@ class Arduino:
 
         value = value.strip('\r')
 
-        return value
-            
+        return value        
+
+              
     def recv_ack(self):
         ''' This command should not be used on its own: it is called by the execute commands
             below in a thread safe manner.
@@ -145,9 +148,46 @@ class Arduino:
         except:
             return []
 
+
     def execute(self, cmd):
         ''' Thread safe execution of "cmd" on the Arduino returning a single integer value.
         '''
+        self.mutex.acquire()
+        
+        try:
+            self.port.flushInput()
+        except:
+            pass
+        
+        ntries = 1
+        attempts = 0
+        
+        try:
+            self.port.write(cmd + '\r')
+            value = self.recv(self.timeout)
+            while attempts < ntries and (value == '' or value == 'Invalid Command' or value == None):
+                try:
+                    self.port.flushInput()
+                    self.port.write(cmd + '\r')
+                    value = self.recv(self.timeout)
+                except:
+                    print "Exception executing command: " + cmd
+                attempts += 1
+        except:
+            self.mutex.release()
+            '''if not self.shutdown:'''
+            print "Exception executing command: " + cmd
+            value = None
+        
+        self.mutex.release()
+        return int(value)
+    
+    
+    
+    def execute_string(self, cmd):
+        ''' Thread safe execution of "cmd" on the Arduino returning a single integer value from 4 bytes
+        '''
+        
         self.mutex.acquire()
         
         try:
@@ -176,8 +216,8 @@ class Arduino:
             value = None
         
         self.mutex.release()
-        return int(value)
-
+        return str(value)
+    
     def execute_array(self, cmd):
         ''' Thread safe execution of "cmd" on the Arduino returning an array.
         '''
@@ -216,7 +256,9 @@ class Arduino:
 
         self.mutex.release()
         return values
-        
+            
+            
+            
     def execute_ack(self, cmd):
         ''' Thread safe execution of "cmd" on the Arduino returning True if response is ACK.
         '''
@@ -261,7 +303,7 @@ class Arduino:
     def get_baud(self):
         ''' Get the current baud rate on the serial port.
         '''
-        return int(self.execute('b'));
+        return self.execute('b')
 
     def get_encoder_counts(self):
         values = self.execute_array('e')
@@ -331,6 +373,20 @@ class Arduino:
             and returns the range in cm.  Sonar distance resolution is integer based.
         '''
         return self.execute('p %d' %pin);
+    
+    
+    def get_KL25ZAccelerometer(self):
+        return self.execute_string('f')
+    
+    def get_x_KL25ZAccelerometer(self):
+        return self.execute_string('f').split('#')[1]
+    
+    def get_y_KL25ZAccelerometer(self):
+        return self.execute_string('f').split('#')[2]
+    
+    def get_z_KL25ZAccelerometer(self):
+        return self.execute_string('f').split('#')[3]
+    
     
 #    def get_maxez1(self, triggerPin, outputPin):
 #        ''' The maxez1 command queries a Maxbotix MaxSonar-EZ1 sonar
