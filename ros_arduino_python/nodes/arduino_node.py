@@ -114,6 +114,8 @@ class ArduinoROS():
                 sensor = PhidgetsVoltage(self.controller, name, params['pin'], params['rate'])
             elif params['type'] == 'PhidgetsCurrent':
                 sensor = PhidgetsCurrent(self.controller, name, params['pin'], params['rate'])
+            elif params['type'] == 'KL25ZAccelerometer':
+                sensor = KL25ZAccelerometer(self.controller, name, params['pin'], params['rate'])
                 
 #                if params['type'] == "MaxEZ1":
 #                    self.sensors[len(self.sensors)]['trigger_pin'] = params['trigger_pin']
