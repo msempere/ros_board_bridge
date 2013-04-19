@@ -1,6 +1,11 @@
-This ROS stack includes an Arduino library (called ROSArduinoBridge) and a collection of ROS packages for controlling an Arduino-based robot using standard ROS messages and services.  The stack does **not** depend on ROS Serial.
+This ROS stack is based in ros_arduino_bridge (https://github.com/hbrobotics/ros_arduino_bridge) from hbrobotics. Thanks to them.
+
+
+It includes an Arduino library (called ROSArduinoBridge) and a collection of ROS packages for controlling an Arduino or MCU-based robot using standard ROS messages and services.  The stack does **not** depend on ROS Serial.
 
 Features of the stack include:
+
+* Total support for FRDM-KL25Z boards (http://www.freescale.com/webapp/sps/site/prod_summary.jsp?code=FRDM-KL25Z&tid=vanFRDM-KL25Z)
 
 * Direct support for Ping sonar and Sharp infrared (GP2D12) sensors
 
@@ -11,6 +16,7 @@ Features of the stack include:
 * Support for PWM servos
 
 * Configurable base controller if using the required hardware
+
 
 The stack includes a base controller for a differential drive
 robot that accepts ROS Twist messages and publishes odometry data back to
@@ -24,6 +30,8 @@ the PC. The base controller requires the use of a motor controller and encoders 
 **NOTE:** The Robogaia Mega Encoder shield can only be used with an Arduino Mega.
 
 * The library can be easily extended to include support for other motor controllers and encoder hardware or libraries.
+
+
 
 Official ROS Documentation
 --------------------------
@@ -178,6 +186,10 @@ The list of commands can be found in the file commands.h.  The current list incl
 #define PIN_MODE       'c'
 #define DIGITAL_READ   'd'
 #define READ_ENCODERS  'e'
+
+/* KL25Z commands */
+#define READ_KL25Z_ACCELEROMETER 'f'
+
 #define MOTOR_SPEEDS   'm'
 #define PING           'p'
 #define RESET_ENCODERS 'r'
@@ -203,6 +215,12 @@ e
 To move the robot forward at 20 encoder ticks per second:
 
 m 20 20
+
+To get all three axis from KL25Z accelerometer:
+
+l
+
+(example of output: #X-Axis#Y-Axis#Z-Axis# )
 
 
 Testing your Wiring Connections
@@ -265,13 +283,17 @@ base_controller_rate: 10
 #	  * PololuMotorCurrent
 #	  * PhidgetsVoltage
 #	  * PhidgetsCurrent (20 Amp, DC)
+#     * KL25ZAccelerometer (where pin 0 is X-axis, pin 1 is Y-axis and pin 2 Z-axis)
 
 sensors: {
-  #motor_current_left:   {pin: 0, type: PololuMotorCurrent, rate: 5},
-  #motor_current_right:  {pin: 1, type: PololuMotorCurrent, rate: 5},
-  #ir_front_center:      {pin: 2, type: GP2D12, rate: 10},
-  #sonar_front_center:   {pin: 5, type: Ping, rate: 10},
-  arduino_led:          {pin: 13, type: Digital, rate: 5, direction: output}
+  #motor_current_left:      {pin: 0, type: PololuMotorCurrent, rate: 5},
+  #motor_current_right:     {pin: 1, type: PololuMotorCurrent, rate: 5},
+  #ir_front_center:         {pin: 2, type: GP2D12, rate: 10},
+  #sonar_front_center:      {pin: 5, type: Ping, rate: 10},
+  arduino_led:              {pin: 13, type: Digital, rate: 5, direction: output},
+  KL25Z_x_accelerometer:    {pin: 0, type: KL25ZAccelerometer, rate: 5},
+  KL25Z_y_accelerometer:    {pin: 1, type: KL25ZAccelerometer, rate: 5},   
+  KL25Z_z_accelerometer:    {pin: 2, type: KL25ZAccelerometer, rate: 5}
 }
 </pre>
 
