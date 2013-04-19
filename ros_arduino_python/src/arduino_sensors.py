@@ -23,6 +23,8 @@ import roslib; roslib.load_manifest('ros_arduino_python')
 import rospy
 from sensor_msgs.msg import Range
 from ros_arduino_msgs.msg import *
+import traceback
+
 
 LOW = 0
 HIGH = 1
@@ -37,6 +39,7 @@ class MessageType:
     FLOAT = 3
     INT = 4
     BOOL = 5
+    STRING = 6
     
 class Sensor(object):
     def __init__(self, controller, name, pin, rate, frame_id="/base_link", direction="input", **kwargs):
@@ -59,6 +62,7 @@ class Sensor(object):
                 try:
                     self.value = self.read_value()
                 except:
+                    print traceback.format_exc()
                     return
             else:
                 try:
@@ -249,8 +253,29 @@ class MaxEZ1Sensor(SonarSensor):
     def read_value(self):
         return self.controller.get_MaxEZ1(self.trigger_pin, self.output_pin)
 
+
+class KL25ZAccelerometer(Sensor):
+    def __init__(self, *args, **kwargs):
+    	super(KL25ZAccelerometer, self).__init__(*args, **kwargs)
+        
+        self.message_type = MessageType.STRING
+        self.msg = String()
+        self.msg.header.frame_id = self.frame_id
+        self.pub = rospy.Publisher("~sensor/" + self.name, String)
+    	
+    def read_value(self):
+        
+        if self.pin == 0:
+                return self.controller.get_x_KL25ZAccelerometer()
+        elif self.pin == 1:
+                return self.controller.get_y_KL25ZAccelerometer()
+        elif self.pin == 2:
+                return self.controller.get_z_KL25ZAccelerometer()
+            
+        
+
             
 if __name__ == '__main__':
     myController = Controller()
-    mySensor = SonarSensor(myController, "My Sonar", type=Type.PING, pin=0, rate=10)
+    '''mySensor = SonarSensor(myController, "My Sonar", type=Type.PING, pin=0, rate=10)'''
             
