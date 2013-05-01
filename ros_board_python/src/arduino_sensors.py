@@ -22,7 +22,7 @@
 import roslib; roslib.load_manifest('ros_arduino_python')
 import rospy
 from sensor_msgs.msg import Range
-from ros_arduino_msgs.msg import *
+from ros_board_msgs.msg import *
 import traceback
 
 

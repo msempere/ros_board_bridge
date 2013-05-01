@@ -1,5 +1,5 @@
 <package>
-  <description brief="ros_arduino_python">
+  <description brief="ros_board_python">
 
      ROS Arduino Python
 
@@ -15,7 +15,7 @@
   <depend package="geometry_msgs"/>
   <depend package="nav_msgs"/>
   <depend package="tf"/>
-  <depend package="ros_arduino_msgs"/>
+  <depend package="ros_board_msgs"/>
   
   <rosdep name="python-serial"/>
   
